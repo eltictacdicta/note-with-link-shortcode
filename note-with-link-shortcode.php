@@ -13,7 +13,7 @@
  * @package         NoteShortcode
  */
 
-//namespace App\Plugins\Pvtl;
+
 
 class NoteShortcode
 {
@@ -67,33 +67,31 @@ class NoteShortcode
         add_shortcode('button', function ($input) {
             if (!is_admin()) {
                 $attr = array(
-                    'text' => 'Learn More',
-                    'href' => '#',
+                    'texto' => 'También te puede interesar:',
+                    'url' => '#',
                     'size' => '',
                     'style' => '',
-                    'target' => '',
+                    //'target' => '',
                     'class' => 'button',
                 );
 
-                if (!empty($input['text'])) {
+                if (!empty($input['texto'])) {
                     $attr['text'] = $input['text'];
                 }
 
-                if (!empty($input['href'])) {
+                if (!empty($input['url'])) {
                     $attr['href'] = $input['href'];
                 }
 
-                if (!empty($input['size'])) {
-                    $attr['size'] = $input['size'];
+                if (!empty($input['anchor'])) {
+                    $attr['anchor'] = $input['anchor'];
                 }
 
-                if (!empty($input['style'])) {
-                    $attr['style'] = $input['style'];
-                }
+                
 
-                if (!empty($input['target'])) {
+                /*if (!empty($input['target'])) {
                     $attr['target'] = $input['target'];
-                }
+                }*/
 
                 $attr = apply_filters('wpbs_attributes', $attr);
 
@@ -101,11 +99,14 @@ class NoteShortcode
                 $html .= 'class="'.$attr['class'].' ' . $attr['size'] . ' '  . $attr['style'] . '" ';
                 $html .= (!empty($attr['target'])) ? 'target="'.$attr['target'].'"' : '';
                 $html .= '>'. $attr['text'] . '</a>';
-
                 return $html;
             }
         });
     }
+
+
+        
+
 }
 
 if (!defined('ABSPATH')) {
@@ -113,3 +114,45 @@ if (!defined('ABSPATH')) {
 }
 
 $mdNoteShortcode = new NoteShortcode();
+
+
+add_action( 'wp_head', function () { 
+    echo '
+    <style>    
+        .nota-cta a{     
+            color:white;        
+            border-bottom: medium solid #16C60C;
+            line-height: 150%;
+    
+        }
+    
+        .nota-cta a:hover{
+            text-decoration:none;
+        }
+        .nota-cta a:link{
+            text-decoration:none;
+        }
+        
+        .nota-cta{
+            border-style:none;
+        }
+    
+        
+    </style>';
+     } );
+    
+    function mostrar_nota_personalizada($atts){
+        $p = shortcode_atts( array (
+            'url' => '',
+            'texto' => ' Tambien te puede interesar:',
+            'anchor'=> ''
+          ), $atts );
+    
+        $texto = '<div class="nota-cta"><div class="su-note-inner su-u-clearfix su-u-trim" style="background-color:#2a5c84;color:#ffffff; text-align:center; padding: 15px; margin-bottom: 15px; ">✅'.$p['texto'].'<strong> <a href="'.$p['url'].'" sytle="text-decoration:none; outline: none;" >'.$p['anchor'].'</a></strong></div></div>';
+    
+    
+    
+        return $texto;
+    }
+    
+    add_shortcode('nota_personalizada', 'mostrar_nota_personalizada');
