@@ -7,18 +7,17 @@
                 editor.windowManager.open( {
                     title: 'Add Note',
                     body: [
-                        /*{
+                        {
                             type: 'listbox',
-                            label: 'Size',
-                            name: 'size',
+                            label: 'Button Type',
+                            name: 'type',
                             values: [
-                                { text: 'Small', value: 'small' },
-                                { text: 'Regular', value: 'regular' },
-                                { text: 'Wide', value: 'wide' },
-                                { text: 'Large', value: 'large' },
+                                { text: 'Note', value: 'note' },
+                                { text: 'Download Button', value: 'download' },
+                                { text: 'Home Button', value: 'home' }
                             ],
-                            value: ''
-                        },*/
+                            value: 'note'
+                        },
                         
                         {
                             type: 'textbox',
@@ -43,7 +42,7 @@
                         }
                     ],
                     onsubmit: function( e ) {
-                        editor.insertContent( '[nota_personalizada url="' + e.data.url + '" texto="' + e.data.texto + '" anchor="' + e.data.anchor + '"]');
+                        editor.insertContent( '[nota_personalizada url="' + e.data.url + '" texto="' + e.data.texto + '" anchor="' + e.data.anchor + '" type="' + e.data.type + '"]');
                     }
                 });
             },

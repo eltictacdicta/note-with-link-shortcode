@@ -141,18 +141,30 @@ add_action( 'wp_head', function () {
     </style>';
      } );
     
-    function mostrar_nota_personalizada($atts){
+    public function registerCustomNoteShortcode() {
+        add_shortcode('nota_personalizada', array($this, 'mostrar_nota_personalizada'));
+    }
+
+    public function mostrar_nota_personalizada($atts){
         $p = shortcode_atts( array (
             'url' => '',
             'texto' => ' Tambien te puede interesar:',
-            'anchor'=> ''
+            'anchor'=> '',
+            'type' => 'note'
           ), $atts );
-    
-        $texto = '<div class="nota-cta"><div class="su-note-inner su-u-clearfix su-u-trim" style="background-color:#2a5c84;color:#ffffff; text-align:center; padding: 15px; margin-bottom: 15px; ">✅'.$p['texto'].'<strong> <a href="'.$p['url'].'" sytle="text-decoration:none; outline: none;" >'.$p['anchor'].'</a></strong></div></div>';
-    
-    
+
+        $icon = '';
+        $classes = 'nota-cta';
+        
+        if ($p['type'] === 'download') {
+            $icon = '⬇️ ';
+            $classes .= ' download-button';
+        } elseif ($p['type'] === 'home') {
+            $icon = '🏠 ';
+            $classes .= ' home-button';
+        }
+
+        $texto = '<div class="'.$classes.'"><div class="su-note-inner su-u-clearfix su-u-trim" style="background-color:#2a5c84;color:#ffffff; text-align:center; padding: 15px; margin-bottom: 15px; ">✅'.$p['texto'].'<strong> <a href="'.$p['url'].'" style="text-decoration:none; outline: none;" >'.$icon.$p['anchor'].'</a></strong></div></div>';
     
         return $texto;
     }
-    
-    add_shortcode('nota_personalizada', 'mostrar_nota_personalizada');
