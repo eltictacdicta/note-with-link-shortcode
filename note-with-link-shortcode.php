@@ -13,8 +13,6 @@
  * @package         NoteShortcode
  */
 
-
-
 class NoteShortcode
 {
     public function __construct()
@@ -22,6 +20,8 @@ class NoteShortcode
         // Call the actions/hooks
         add_action('after_setup_theme', array($this, 'afterSetupTheme'));
         add_action('init', array($this, 'registerNoteShortcode'));
+        add_action('init', array($this, 'registerCustomNoteShortcode'));
+        add_action('wp_head', array($this, 'addCustomStyles'));
     }
 
     /**
@@ -71,27 +71,20 @@ class NoteShortcode
                     'url' => '#',
                     'size' => '',
                     'style' => '',
-                    //'target' => '',
                     'class' => 'button',
                 );
 
                 if (!empty($input['texto'])) {
-                    $attr['text'] = $input['text'];
+                    $attr['text'] = $input['texto'];
                 }
 
                 if (!empty($input['url'])) {
-                    $attr['href'] = $input['href'];
+                    $attr['href'] = $input['url'];
                 }
 
                 if (!empty($input['anchor'])) {
                     $attr['anchor'] = $input['anchor'];
                 }
-
-                
-
-                /*if (!empty($input['target'])) {
-                    $attr['target'] = $input['target'];
-                }*/
 
                 $attr = apply_filters('wpbs_attributes', $attr);
 
@@ -104,58 +97,34 @@ class NoteShortcode
         });
     }
 
-
-        
-
-}
-
-if (!defined('ABSPATH')) {
-    exit;  // Exit if accessed directly
-}
-
-$mdNoteShortcode = new NoteShortcode();
-
-
-add_action( 'wp_head', function () { 
-    echo '
-    <style>    
-        .nota-cta a{     
-            color:white;        
-            border-bottom: medium solid #16C60C;
-            line-height: 150%;
-    
-        }
-    
-        .nota-cta a:hover{
-            text-decoration:none;
-        }
-        .nota-cta a:link{
-            text-decoration:none;
-        }
-        
-        .nota-cta{
-            border-style:none;
-        }
-    
-        
-    </style>';
-     } );
-    
-    public function registerCustomNoteShortcode() {
+    /**
+     * Register custom note shortcode
+     *
+     * @return void
+     */
+    public function registerCustomNoteShortcode()
+    {
         add_shortcode('nota_personalizada', array($this, 'mostrar_nota_personalizada'));
     }
 
-    public function mostrar_nota_personalizada($atts){
-        $p = shortcode_atts( array (
+    /**
+     * Display custom note
+     *
+     * @param array $atts Shortcode attributes
+     * @return string
+     */
+    public function mostrar_nota_personalizada($atts)
+    {
+        $p = shortcode_atts(array(
             'url' => '',
-            'texto' => ' Tambien te puede interesar:',
-            'anchor'=> '',
+            'texto' => 'También te puede interesar:',
+            'anchor' => '',
             'type' => 'note'
-          ), $atts );
+        ), $atts);
 
         $icon = '';
         $classes = 'nota-cta';
-        
+
         if ($p['type'] === 'download') {
             $icon = '⬇️ ';
             $classes .= ' download-button';
@@ -164,7 +133,99 @@ add_action( 'wp_head', function () {
             $classes .= ' home-button';
         }
 
-        $texto = '<div class="'.$classes.'"><div class="su-note-inner su-u-clearfix su-u-trim" style="background-color:#2a5c84;color:#ffffff; text-align:center; padding: 15px; margin-bottom: 15px; ">✅'.$p['texto'].'<strong> <a href="'.$p['url'].'" style="text-decoration:none; outline: none;" >'.$icon.$p['anchor'].'</a></strong></div></div>';
-    
+        // Generar el HTML en función del tipo
+        if ($p['type'] === 'note') {
+            $texto = '<div class="'.$classes.'"><div class="su-note-inner su-u-clearfix su-u-trim" style="background-color:#2a5c84;color:#ffffff; text-align:center; padding: 15px; margin-bottom: 15px; ">✅'.$p['texto'].'<strong> <a href="'.$p['url'].'" style="text-decoration:none; outline: none;" >'.$icon.$p['anchor'].'</a></strong></div></div>';
+        } else {
+            // Para tipos 'download' y 'home', generar un botón
+            $texto = '<div class="'.$classes.'" style="text-align:center; margin-bottom: 15px;">
+                        <a href="'.$p['url'].'" style="text-decoration:none; outline: none;">
+                            <button style="background-color:#2a5c84; color:#ffffff; border:none; padding: 15px 30px; cursor:pointer; font-size:16px;">
+                                '.$icon.$p['anchor'].'
+                            </button>
+                        </a>
+                    </div>';
+        }
+
         return $texto;
     }
+
+    /**
+     * Add custom styles to the head
+     *
+     * @return void
+     */
+    public function addCustomStyles()
+    {
+        echo '
+        <style>    
+            /* Estilos para el botón generado por el shortcode [button] */
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                text-decoration: none;
+                color: #ffffff;
+                background-color: #0073aa;
+                border-radius: 5px;
+                border: 2px solid #0073aa;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            .button:hover {
+                background-color: #005177;
+                border-color: #005177;
+                color: #ffffff;
+            }
+
+            /* Estilos para el botón de descarga */
+            .download-button {
+                background-color: #4CAF50;
+                border-color: #4CAF50;
+            }
+
+            .download-button:hover {
+                background-color: #45a049;
+                border-color: #45a049;
+            }
+
+            /* Estilos para el botón de inicio */
+            .home-button {
+                background-color: #f44336;
+                border-color: #f44336;
+            }
+
+            .home-button:hover {
+                background-color: #d32f2f;
+                border-color: #d32f2f;
+            }
+
+            /* Estilos para la nota personalizada */
+            .nota-cta a {     
+                color: white;        
+                border-bottom: medium solid #16C60C;
+                line-height: 150%;
+            }
+
+            .nota-cta a:hover {
+                text-decoration: none;
+            }
+
+            .nota-cta a:link {
+                text-decoration: none;
+            }
+
+            .nota-cta {
+                border-style: none;
+            }
+        </style>';
+    }
+} // <-- Closing brace for the NoteShortcode class
+
+if (!defined('ABSPATH')) {
+    exit;  // Exit if accessed directly
+}
+
+$mdNoteShortcode = new NoteShortcode();
